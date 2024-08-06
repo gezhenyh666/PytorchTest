@@ -19,7 +19,7 @@ class ToyModel(nn.Module):
 def demo_basic():
     dist.init_process_group("nccl")
     rank = dist.get_rank() # rank = nnodes * nproc_per_node
-    print(f"Start running basic DDP example on rank {rank}.")
+    #print(f"Start running basic DDP example on rank {rank}.")
 
     device_id = rank % torch.cuda.get_device_count()
     model = ToyModel().to(device_id)
@@ -27,12 +27,12 @@ def demo_basic():
 
     loss_fn = nn.MSELoss()
     optimizer = optim.SGD(ddp_model.parameters(), lr=0.001)
-    optimizer.zero_grad()
-
-    outputs = ddp_model(torch.randn(20, 10))
-    labels = torch.randn(20, 5).to(device_id)
-    loss_fn(outputs, labels).backward()
-    optimizer.setp()
+    while True:
+        optimizer.zero_grad()
+        outputs = ddp_model(torch.randn(20, 10))
+        labels = torch.randn(20, 5).to(device_id)
+        loss_fn(outputs, labels).backward()
+        optimizer.setp()
     dist.destroy_process_group()
 
 
